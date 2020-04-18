@@ -1,0 +1,189 @@
+diff -Naur original/main.c target/main.c
+--- original/main.c	1970-01-01 01:00:00.000000000 +0100
++++ target/main.c	2020-04-18 19:12:18.627429354 +0200
+@@ -0,0 +1,16 @@
++#include <stdarg.h>
++#include <stdbool.h>
++#include <stdio.h>
++#include <stdlib.h>
++
++#include "zs_lex.h"
++
++int
++main (void)
++{
++    bool verbose = true;
++    zs_lex_test (verbose);
++    exit (0);
++}
++
++
+diff -Naur original/Makefile target/Makefile
+--- original/Makefile	1970-01-01 01:00:00.000000000 +0100
++++ target/Makefile	2020-04-18 19:13:36.848605858 +0200
+@@ -0,0 +1,38 @@
++
++DEBUG=yes
++CC=gcc
++ifeq ($(DEBUG),yes)
++	CFLAGS=-Wall -pedantic -g
++	LDFLAGS=
++else
++	CFLAGS=-Wall -pedantic
++	LDFLAGS=
++endif
++EXEC=main
++SRC= $(wildcard *.c)
++OBJ= $(SRC:.c=.o)
++
++all: $(EXEC)
++ifeq ($(DEBUG),yes)
++	@echo "Génération en mode debug"
++else
++	@echo "Génération en mode release"
++endif
++
++main: $(OBJ)
++	@$(CC) -o $@ $^ $(LDFLAGS)
++
++main.o: zs_lex.h zs_lex_fsm.h zsys.h
++
++%.o: %.c
++	@$(CC) -o $@ -c $< $(CFLAGS)
++
++.PHONY: clean mrproper
++
++clean:
++	@rm -rf *.o
++
++mrproper: clean
++	@rm -rf $(EXEC)
++
++
+diff -Naur original/zs_lex.c target/zs_lex.c
+--- original/zs_lex.c	2015-05-09 17:42:28.000000000 +0200
++++ target/zs_lex.c	2020-04-18 19:07:50.037820095 +0200
+@@ -66,7 +66,7 @@
+ zs_lex_t *
+ zs_lex_new (void)
+ {
+-    zs_lex_t *self = (zs_lex_t *) zmalloc (sizeof (zs_lex_t));
++    zs_lex_t *self = (zs_lex_t *) malloc (sizeof (zs_lex_t));
+     if (self) {
+         self->fsm = fsm_new (self);
+         uint char_nbr;
+@@ -330,7 +330,7 @@
+ //  ---------------------------------------------------------------------------
+ //  Return number of processing cycles used so far
+ 
+-uint64_t
++uint
+ zs_lex_cycles (zs_lex_t *self)
+ {
+     return fsm_cycles (self->fsm);
+@@ -466,3 +466,4 @@
+     //  @end
+     printf ("OK\n");
+ }
++
+diff -Naur original/zs_lex_fsm.h target/zs_lex_fsm.h
+--- original/zs_lex_fsm.h	2015-05-09 17:42:28.000000000 +0200
++++ target/zs_lex_fsm.h	2020-04-18 19:07:50.041824374 +0200
+@@ -110,13 +110,13 @@
+     event_t event;              //  Current event
+     event_t next_event;         //  The next event
+     event_t exception;          //  Exception event, if any
+-    uint64_t cycles;            //  Track the work done
++    uint cycles;            //  Track the work done
+ } fsm_t;
+ 
+ static fsm_t *
+ fsm_new (zs_lex_t *parent)
+ {
+-    fsm_t *self = (fsm_t *) zmalloc (sizeof (fsm_t));
++    fsm_t *self = (fsm_t *) malloc (sizeof (fsm_t));
+     if (self) {
+         self->state = expecting_token_state;
+         self->event = NULL_event;
+@@ -154,7 +154,7 @@
+     self->animate = animate;
+ }
+ 
+-static uint64_t
++static uint
+ fsm_cycles (fsm_t *self)
+ {
+     return self->cycles;
+@@ -899,3 +899,4 @@
+             zsys_debug ("zs_lex:                > %s", s_state_name [self->state]);
+     }
+ }
++
+diff -Naur original/zs_lex.h target/zs_lex.h
+--- original/zs_lex.h	2015-05-09 17:42:28.000000000 +0200
++++ target/zs_lex.h	2020-04-18 19:12:56.513060525 +0200
+@@ -13,7 +13,15 @@
+ #ifndef ZS_LEX_H_INCLUDED
+ #define ZS_LEX_H_INCLUDED
+ 
+-#include <czmq.h>
++/* #include <czmq.h> */
++
++#include <assert.h>
++#include <stdarg.h>
++#include <stdbool.h>
++#include <stdio.h>
++#include <stdlib.h>
++
++#include "zsys.h"
+ 
+ #ifdef __cplusplus
+ extern "C" {
+@@ -66,7 +74,7 @@
+     zs_lex_offset (zs_lex_t *self);
+ 
+ //  Return number of processing cycles used so far
+-uint64_t
++uint
+     zs_lex_cycles (zs_lex_t *self);
+ 
+ //  Self test of this class
+@@ -79,3 +87,4 @@
+ #endif
+ 
+ #endif
++
+diff -Naur original/zsys.c target/zsys.c
+--- original/zsys.c	1970-01-01 01:00:00.000000000 +0100
++++ target/zsys.c	2020-04-18 19:10:41.209302318 +0200
+@@ -0,0 +1,18 @@
++#include <stdarg.h>
++#include <stdbool.h>
++#include <stdio.h>
++#include <stdlib.h>
++
++#include "zsys.h"
++
++void
++zsys_debug (const char *fmt, ...)
++{
++    va_list args;
++    va_start(args, fmt);
++    vfprintf(stdout, fmt, args);
++    fprintf(stdout, "\n");
++    va_end(args);
++}
++
++
+diff -Naur original/zsys.h target/zsys.h
+--- original/zsys.h	1970-01-01 01:00:00.000000000 +0100
++++ target/zsys.h	2020-04-18 19:11:52.884876285 +0200
+@@ -0,0 +1,8 @@
++#ifndef ZSYS_H_INCLUDED
++#define ZSYS_H_INCLUDED
++
++void
++    zsys_debug (const char *fmt, ...);
++
++#endif
++
