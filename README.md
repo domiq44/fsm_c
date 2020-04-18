@@ -5,7 +5,7 @@ It is a Finite State Machine (FSM) written in Scalable C (see Pieter Hintjens) g
 
 Scalable C can be found here : https://legacy.gitbook.com/book/hintjens/scalable-c/details.
 
-But, to play with it, it is necessary to install a certain number of libraries, and more particularly, the libzmq and CSMQ libraries.
+But, to play with it, it is necessary to install a certain number of libraries, and more particularly, the libzmq (https://github.com/zeromq/libzmq) and CZMQ (https://github.com/zeromq/czmq) libraries.
 
 Since I did not want to do all of this stuff, I preferred to create this small patch allowing to compile it simply, and then to play with it quickly.
 
