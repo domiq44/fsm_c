@@ -19,7 +19,9 @@ Note: Makefile has been built following documentation found here : [Introduction
 
 ## Installation ##
 
-If you enter `./install.sh fsm_c`, a directory **fsm_c** will be created in the directory you launch this command. The output will be :
+If you enter `./install.sh fsm_c`, a directory **fsm_c** will be created in the directory you launch this command.
+
+The output will be :
 
     Installing GSL examples in 'fsm_c'...
     A    fsm_c
@@ -39,7 +41,7 @@ If you enter `./install.sh fsm_c`, a directory **fsm_c** will be created in the 
 
 Then, you can go into the freshly created directory and build the test with entering `make` 
 
-Finally, you can run the test by entering `.main`, you will get the output :
+Finally, you can run the test by entering `./main`, you will get the output :
 
      * zs_lex: 
     zs_lex: expecting_token:
